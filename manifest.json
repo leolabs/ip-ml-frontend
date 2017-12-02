@@ -1,0 +1,7 @@
+{
+  "name": "ip-ml-frontend",
+  "short_name": "ip-ml-frontend",
+  "description": "Frontend for the game",
+  "start_url": "/",
+  "display": "standalone"
+}
