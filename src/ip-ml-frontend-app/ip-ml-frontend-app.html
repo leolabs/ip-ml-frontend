@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../canvas-area/canvas-area.html">
 
 <dom-module id="ip-ml-frontend-app">
   <template>
@@ -6,8 +7,25 @@
       :host {
         display: block;
       }
+
+      canvas-area {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: -10;
+      }
+
+      img {
+        border: 1px solid #ccc;
+      }
     </style>
-    <h2>Hello [[prop1]]!</h2>
+
+    <canvas-area id="canvas"></canvas-area>
+
+    <img style="width: 300px; height: 300px" id="img">
+    <img style="image-rendering: pixelated; width: 300px; height: 300px" id="img2">
   </template>
 
   <script>
@@ -24,6 +42,15 @@
             value: 'ip-ml-frontend-app'
           }
         };
+      }
+
+      ready() {
+          super.ready();
+          this.$.canvas.addEventListener('data', (e) => {
+              console.log(e.detail.trimmed, e.detail.trimmed.toDataURL());
+              this.$.img.src = e.detail.trimmed.toDataURL();
+              this.$.img2.src = e.detail.fit.toDataURL();
+          });
       }
     }
 
