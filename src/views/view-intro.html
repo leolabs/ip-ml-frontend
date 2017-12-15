@@ -1,15 +1,46 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../components/canvas-area.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-styles/paper-styles.html">
 
 <dom-module id="view-intro">
   <template>
     <style>
       :host {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+      }
+
+      img {
         display: block;
+        max-width: 400px;
+        margin: 10px 10px 50px;
+      }
+
+      video {
+        width: 100%;
+        max-width: 1000px;
+        height: auto;
+        margin-bottom: 50px;
+      }
+
+      paper-button {
+        background-color: #1CB5AC;
+        font-size: 30px;
+        color: #fff;
+        text-transform: uppercase;
       }
     </style>
 
-    <h1>Sketch me if you can!</h1>
+    <img src="../../images/logo.svg">
+
+    <video autoplay loop muted>
+      <source id="mp4" src="https://media.w3.org/2010/05/sintel/trailer.mp4" type="video/mp4">
+    </video>
+
+    <paper-button raised on-tap="start">Let's go!</paper-button>
   </template>
 
   <script>
@@ -27,6 +58,16 @@
 
       ready() {
           super.ready();
+      }
+
+      start() {
+          console.log('start');
+
+          this.dispatchEvent(new CustomEvent('navigateTo', {
+              detail: {path: 'game'},
+              bubbles: true,
+              composed: true
+          }));
       }
     }
 
