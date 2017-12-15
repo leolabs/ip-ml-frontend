@@ -91,14 +91,12 @@
                     const newWidth = 28;
                     const newHeight = c.height * factor;
                     const offsetTop = (28 - newHeight) / 2;
-                    console.log(c.width, c.height, factor, newWidth, newHeight, offsetTop, 0);
                     ctx.drawImage(c, 0, offsetTop, newWidth, newHeight);
                 } else {
                     const factor = 28 / c.height;
                     const newHeight = 28;
                     const newWidth = c.width * factor;
                     const offsetLeft = (28 - newWidth) / 2;
-                    console.log(c.width, c.height, factor, newWidth, newHeight, 0, offsetLeft);
                     ctx.drawImage(c, offsetLeft, 0, newWidth, newHeight);
                 }
 
