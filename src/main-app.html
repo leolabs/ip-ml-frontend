@@ -10,59 +10,58 @@
 <link rel="import" href="../bower_components/app-route/app-location.html">
 
 <dom-module id="main-app">
-  <template>
-    <style>
-      :host {
-        display: block;
-      }
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+        </style>
 
-      canvas-area {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        top: 0;
-        left: 0;
-        z-index: -10;
-      }
+        <app-location route="{{route}}"></app-location>
 
-      img {
-        border: 1px solid #ccc;
-      }
-    </style>
+        <app-route
+                route="{{route}}"
+                pattern="/:page"
+                data="{{data}}"
+                tail="{{tail}}">
+        </app-route>
 
-    <app-location route="{{route}}"></app-location>
+        <iron-pages selected="[[data.page]]" attr-for-selected="data-view" fallback-selection="intro">
+            <view-intro data-view="intro" route="{{tail}}"></view-intro>
+            <view-game data-view="game" route="{{tail}}"></view-game>
+            <view-result data-view="result" route="{{tail}}"></view-result>
+        </iron-pages>
+    </template>
 
-    <app-route
-            route="{{route}}"
-            pattern="/:page"
-            data="{{data}}"
-            tail="{{tail}}">
-    </app-route>
+    <script>
+        /**
+         * @customElement
+         * @polymer
+         */
+        class MainApp extends Polymer.Element {
+            static get is() {
+                return 'main-app';
+            }
 
-    <iron-pages selected="[[data.page]]" attr-for-selected="data-view" fallback-selection="intro">
-      <view-intro data-view="intro" route="{{tail}}"></view-intro>
-      <view-game data-view="game" route="{{tail}}"></view-game>
-      <view-result data-view="result" route="{{tail}}"></view-result>
-    </iron-pages>
-  </template>
+            static get properties() {
+                return {
+                    route: {
+                        type: Object
+                    }
+                };
+            }
 
-  <script>
-    /**
-     * @customElement
-     * @polymer
-     */
-    class MainApp extends Polymer.Element {
-      static get is() { return 'main-app'; }
-      static get properties() {
-        return {
-        };
-      }
+            ready() {
+                super.ready();
 
-      ready() {
-          super.ready();
-      }
-    }
+                this.addEventListener('navigateTo', e => {
+                    console.log('yo', e);
+                    window.history.pushState({}, null, e.detail.path);
+                    window.dispatchEvent(new CustomEvent('location-changed'));
+                });
+            }
+        }
 
-    window.customElements.define(MainApp.is, MainApp);
-  </script>
+        window.customElements.define(MainApp.is, MainApp);
+    </script>
 </dom-module>

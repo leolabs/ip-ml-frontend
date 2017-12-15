@@ -2,34 +2,95 @@
 <link rel="import" href="../components/canvas-area.html">
 
 <dom-module id="view-game">
-  <template>
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+    <template>
+        <style>
+            :host {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+            }
 
-    <h1>Game</h1>
-  </template>
+            canvas-area {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                top: 0;
+                left: 0;
+                z-index: 10;
+            }
 
-  <script>
-    /**
-     * @customElement
-     * @polymer
-     */
-    class ViewGame extends Polymer.Element {
-      static get is() { return 'view-game'; }
-      static get properties() {
-        return {
+            .word {
+                font-family: 'Roboto', 'Noto', sans-serif;
+                font-size: 400px;
+                line-height: 400px;
+                margin: 0;
+                color: #efefef;
+                transition: opacity 0.5s, transform 0.5s;
+                opacity: 1;
+                transform: scale(1);
+            }
 
-        };
-      }
+            .word.correct {
+                z-index: 50;
+                transform: scale(2);
+                opacity: 0;
+                color: #00c853;
+            }
+        </style>
 
-      ready() {
-          super.ready();
-      }
-    }
+        <canvas-area></canvas-area>
 
-    window.customElements.define(ViewGame.is, ViewGame);
-  </script>
+        <h2 class="word">[[word]]</h2>
+    </template>
+
+    <script>
+        /**
+         * @customElement
+         * @polymer
+         */
+        class ViewGame extends Polymer.Element {
+            static get is() {
+                return 'view-game';
+            }
+
+            static get properties() {
+                return {
+                    route: {
+                        type: Object,
+                        value: () => {
+                        }
+                    },
+                    word: {
+                        type: String
+                    }
+                };
+            }
+
+            static get observers() {
+                return [
+                    'routeChanged(route.*)'
+                ]
+            }
+
+            ready() {
+                super.ready();
+
+                window.addEventListener('location-changed', () => {
+                    setTimeout(() => {
+                        window.dispatchEvent(new Event('resize'));
+                        if (this.route.active) clearInterval(interval);
+                    }, 200);
+                });
+            }
+
+            routeChanged() {
+                const words = ['Fliege', 'Amboss', 'Apfel', 'Flieger', 'Kamel', 'Axt', 'Banane', 'Basketball', 'Kartoffel', 'Socke', 'Sandwich', 'Teekanne', 'Fallschirm', 'Schwein', 'Panda'];
+                this.word = words[Math.floor(Math.random() * words.length)];
+            }
+        }
+
+        window.customElements.define(ViewGame.is, ViewGame);
+    </script>
 </dom-module>
