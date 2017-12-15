@@ -5,7 +5,9 @@
   "dependencies": {
     "polymer": "Polymer/polymer#^2.0.0",
     "sign-here": "CaptainCodeman/sign-here#^0.0.1",
-    "iron-resizable-behavior": "PolymerElements/iron-resizable-behavior#^2.0.1"
+    "iron-resizable-behavior": "PolymerElements/iron-resizable-behavior#^2.0.1",
+    "iron-pages": "PolymerElements/iron-pages#^2.0.1",
+    "app-route": "PolymerElements/app-route#^2.0.3"
   },
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^6.0.0",

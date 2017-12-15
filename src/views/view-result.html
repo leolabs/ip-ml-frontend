@@ -1,0 +1,34 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../components/canvas-area.html">
+
+<dom-module id="view-result">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <h1>Ergebnis</h1>
+  </template>
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class ViewResult extends Polymer.Element {
+      static get is() { return 'view-result'; }
+      static get properties() {
+        return {
+        };
+      }
+
+      ready() {
+          super.ready();
+      }
+    }
+
+    window.customElements.define(ViewResult.is, ViewResult);
+  </script>
+</dom-module>

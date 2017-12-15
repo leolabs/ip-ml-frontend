@@ -1,0 +1,35 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../components/canvas-area.html">
+
+<dom-module id="view-intro">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <h1>Sketch me if you can!</h1>
+  </template>
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class ViewIntro extends Polymer.Element {
+      static get is() { return 'view-intro'; }
+      static get properties() {
+        return {
+
+        };
+      }
+
+      ready() {
+          super.ready();
+      }
+    }
+
+    window.customElements.define(ViewIntro.is, ViewIntro);
+  </script>
+</dom-module>

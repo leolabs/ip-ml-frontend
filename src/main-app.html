@@ -1,0 +1,68 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="components/canvas-area.html">
+
+<link rel="import" href="views/view-intro.html">
+<link rel="import" href="views/view-game.html">
+<link rel="import" href="views/view-result.html">
+
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/app-route/app-location.html">
+
+<dom-module id="main-app">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      canvas-area {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: -10;
+      }
+
+      img {
+        border: 1px solid #ccc;
+      }
+    </style>
+
+    <app-location route="{{route}}"></app-location>
+
+    <app-route
+            route="{{route}}"
+            pattern="/:page"
+            data="{{data}}"
+            tail="{{tail}}">
+    </app-route>
+
+    <iron-pages selected="[[data.page]]" attr-for-selected="data-view" fallback-selection="intro">
+      <view-intro data-view="intro" route="{{tail}}"></view-intro>
+      <view-game data-view="game" route="{{tail}}"></view-game>
+      <view-result data-view="result" route="{{tail}}"></view-result>
+    </iron-pages>
+  </template>
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class MainApp extends Polymer.Element {
+      static get is() { return 'main-app'; }
+      static get properties() {
+        return {
+        };
+      }
+
+      ready() {
+          super.ready();
+      }
+    }
+
+    window.customElements.define(MainApp.is, MainApp);
+  </script>
+</dom-module>
