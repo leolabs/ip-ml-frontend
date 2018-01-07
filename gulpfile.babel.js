@@ -41,5 +41,5 @@ gulp.task('polymer', ['del'], () => {
         .pipe(gulp.dest(buildDir))
 });
 
-gulp.task('build', 'polymer');
+gulp.task('build', ['polymer']);
 gulp.task('default', ['build']);
