@@ -3,5 +3,16 @@
     "rules": [
       "polymer-2"
     ]
-  }
+  },
+  "entrypoint": "index.html",
+  "shell": "src/main-app.html",
+  "sources": [
+    "elements/**/*",
+    "images/**/*"
+  ],
+  "extraDependencies": [
+    "manifest.json",
+    "bower_components/webcomponentsjs/*.js",
+    "_redirects"
+  ]
 }
