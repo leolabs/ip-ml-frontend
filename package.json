@@ -1,5 +1,22 @@
 {
   "dependencies": {
+    "autoprefixer": "^7.2.4",
+    "babel-core": "^6.26.0",
+    "babili": "^0.1.4",
+    "cssnano": "^3.10.0",
+    "del": "^3.0.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^7.0.0",
+    "gulp-babili": "^0.1.4",
+    "gulp-html-postcss": "^7.0.3",
+    "gulp-htmlmin": "^4.0.0",
+    "gulp-if": "^2.0.2",
+    "gulp-load-plugins": "^1.5.0",
+    "gulp-postcss": "^7.0.1",
+    "htmlmin": "^0.0.7",
+    "merge-stream": "^1.0.1",
+    "moment": "^2.20.1",
+    "polymer-build": "^2.1.1",
     "polymer-cli": "^1.5.7",
     "signature_pad": "^2.3.2"
   }
