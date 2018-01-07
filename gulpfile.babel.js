@@ -7,6 +7,7 @@ import mergeStream from 'merge-stream';
 import gulpLoadPlugins from 'gulp-load-plugins';
 import autoprefixer from 'autoprefixer';
 import cssnano from 'cssnano';
+import runSequence from 'run-sequence';
 
 const buildDir = 'build';
 const project = new PolymerProject(require('./polymer.json'));
@@ -41,5 +42,7 @@ gulp.task('polymer', ['del'], () => {
         .pipe(gulp.dest(buildDir))
 });
 
-gulp.task('build', ['polymer']);
+gulp.task('assets', () => gulp.src('images/**/*').pipe(gulp.dest('build/images')));
+
+gulp.task('build', runSequence('del', ['polymer', 'assets']));
 gulp.task('default', ['build']);
