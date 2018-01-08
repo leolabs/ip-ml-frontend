@@ -8,7 +8,8 @@
   "shell": "src/main-app.html",
   "sources": [
     "elements/**/*",
-    "images/**/*"
+    "images/**/*",
+    "videos/**/*"
   ],
   "extraDependencies": [
     "manifest.json",
