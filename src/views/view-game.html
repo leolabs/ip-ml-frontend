@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../components/canvas-area.html">
+<link rel="import" href="../components/api.html">
 
 <dom-module id="view-game">
     <template>
@@ -41,7 +42,7 @@
             }
         </style>
 
-        <canvas-area></canvas-area>
+        <canvas-area id="canvas"></canvas-area>
 
         <h2 class="word">[[word]]</h2>
     </template>
@@ -78,6 +79,20 @@
             ready() {
                 super.ready();
 
+                this.addEventListener('data', data => {
+                    let url = data.detail.fit.toDataURL("image/png");
+
+                    fetch(url)
+                        .then(res => res.blob())
+                        .then(blob => {
+                            let fileReader = new FileReader();
+                            fileReader.onload = function() {
+                                sendBlob(this.result);
+                            };
+                            fileReader.readAsArrayBuffer(blob);
+                        });
+                });
+
                 window.addEventListener('location-changed', () => {
                     setTimeout(() => {
                         window.dispatchEvent(new Event('resize'));
@@ -87,7 +102,8 @@
             }
 
             routeChanged() {
-                const words = ['Fliege', 'Amboss', 'Apfel', 'Flieger', 'Kamel', 'Axt', 'Banane', 'Basketball', 'Kartoffel', 'Socke', 'Sandwich', 'Teekanne', 'Fallschirm', 'Schwein', 'Panda'];
+                const words = ['Fliege', 'Amboss', 'Apfel', 'Flieger', 'Kamel', 'Axt', 'Banane', 'Basketball',
+                    'Kartoffel', 'Socke', 'Sandwich', 'Teekanne', 'Fallschirm', 'Schwein', 'Panda'];
                 this.word = words[Math.floor(Math.random() * words.length)];
             }
         }

@@ -1,0 +1,59 @@
+<script>
+    // NOTE: Maybe there needs to be a listener to the onmessage function of the socket here (depends on frontend implementation)
+
+    let socket = null;
+    let isopen = false;
+
+    //Initializing the WebSocket
+    window.onload = function () {
+        "use strict";
+
+        //Currently the test and such the only port
+        let socket = new WebSocket("ws://localhost:9000");
+        socket.binaryType = 'arraybuffer';
+
+        //Callback when the sockets recieves a message (should only be a result json here)
+        socket.onmessage = function (result) {
+            if (typeof result.data === "string") {
+                console.log("JS-Socket: Message received | ", result.data);
+                return result.data;
+            } else {
+                console.error("JS-Socket: Received response of wrong type");
+            }
+        };
+
+        //Callback when the socket opens
+        socket.onopen = function() {
+            console.log("JS-Socket: Connected");
+            isopen = true;
+        };
+
+        //Callback when the socket closes
+        socket.onclose = function() {
+            console.log("JS-Socket: Connection closed");
+            socket = null;
+            isopen = false;
+        };
+
+        window.socket = socket;
+    };
+
+    //function to call when sending text through the socket
+    function sendText(jsonString) {
+        "use strict";
+        if (isopen) {
+            if (typeof jsonString !== "string") {
+                console.error("JS-Socket: Input has wrong type. String was expected");
+            } else {
+                socket.send(jsonString);
+                console.log("JS-Socket: Text message sent | ", jsonString);
+            }
+        } else {
+            console.log("JS-Socket: Connection not opened");
+        }
+    }
+
+    function sendBlob(blob) {
+        window.socket.send(blob);
+    }
+</script>
