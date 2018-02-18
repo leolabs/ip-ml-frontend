@@ -40,8 +40,8 @@
                 super.connectedCallback();
 
                 this.signaturePad = new SignaturePad(this.$.canvas, {
-                    minWidth: 5,
-                    maxWidth: 5,
+                    minWidth: 10,
+                    maxWidth: 10,
                     onEnd: () => {
                         const trimmed = this.trim(this.$.canvas);
                         const fit = this.fit(trimmed);
@@ -73,6 +73,10 @@
 
             clear() {
                 this.signaturePad.clear();
+            }
+
+            getTrimmedImage() {
+                return this.trim(this.$.canvas);
             }
 
             fit(c) {
@@ -147,13 +151,18 @@
                     }
                 }
 
-                var trimHeight = bound.bottom - bound.top,
-                    trimWidth = bound.right - bound.left,
-                    trimmed = ctx.getImageData(bound.left, bound.top, trimWidth, trimHeight);
+                const trimHeight = bound.bottom - bound.top,
+                    trimWidth = bound.right - bound.left;
 
-                copy.canvas.width = trimWidth;
-                copy.canvas.height = trimHeight;
-                copy.putImageData(trimmed, 0, 0);
+
+                if(trimWidth > 0 && trimHeight > 0) {
+                    let trimmed = ctx.getImageData(bound.left, bound.top, trimWidth, trimHeight);
+
+                    copy.canvas.width = trimWidth;
+                    copy.canvas.height = trimHeight;
+
+                    copy.putImageData(trimmed, 0, 0);
+                }
 
                 // open new window with trimmed image:
                 return copy.canvas;

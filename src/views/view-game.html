@@ -12,6 +12,7 @@
                 justify-content: center;
                 min-height: 100vh;
                 overflow: hidden;
+                user-select: none;
             }
 
             canvas-area {
@@ -23,28 +24,107 @@
                 z-index: 10;
             }
 
+            :host(.done) canvas-area {
+                transform: scale(0.8);
+                transition: opacity 1s, transform 1s;
+                opacity: 0;
+            }
+
+            :host(.done) .word {
+                z-index: 50;
+                transform: scale(1.2);
+                transition: opacity 1s, transform 1s;
+                opacity: 0;
+            }
+
+            :host(.correct) .word {
+                color: #2e7d32;
+            }
+
+            :host(.wrong) .word {
+                color: #b71c1c;
+            }
+
+            :host(.done) .timer {
+                transition: none;
+                opacity: 0;
+            }
+
             .word {
                 font-family: 'Roboto', 'Noto', sans-serif;
-                font-size: 17vw;
+                font-size: 14vw;
                 line-height: 400px;
                 margin: 0;
                 color: #efefef;
-                transition: opacity 0.5s, transform 0.5s;
                 opacity: 1;
                 transform: scale(1);
+                transition: opacity 0.5s;
             }
 
-            .word.correct {
-                z-index: 50;
-                transform: scale(2);
-                opacity: 0;
-                color: #00c853;
+            .timer {
+                pointer-events: none;
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 10px;
+                transition: width 1s linear, background-color 6s linear, opacity 1s;
+            }
+
+            #clear {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                width: 64px;
+                height: 64px;
+                padding: 8px;
+                background: rgba(255, 255, 255, 0.8) url('/images/delete.svg') no-repeat center;
+                background-origin: content-box;
+                background-size: contain;
+                border: none;
+                border-radius: 8px;
+                z-index: 500;
+                cursor: pointer;
+                outline: none;
+            }
+
+            .recognizedWord {
+                pointer-events: none;
+                font-family: 'Roboto', 'Noto', sans-serif;
+                color: #1CB5AC;
+                position: absolute;
+                bottom: 20px;
+                font-size: 5vw;
+                text-align: center;
+                left: 20px;
+                right: 20px;
+                margin: 0;
+                animation: newRecognition;
+                animation-duration: 2s;
+                animation-iteration-count: 1;
+                animation-fill-mode: forwards;
+            }
+
+            @keyframes newRecognition {
+                0% {
+                    transform: scale(1);
+                }
+
+                100% {
+                    opacity: 0;
+                    transform: translateY(-100px) scale(1.3);
+                }
             }
         </style>
 
+        <div class="timer" style$="[[_generateTimerStyle(timeLeft, time)]]"></div>
+
+        <button on-click="clearCanvas" id="clear"></button>
+
         <canvas-area id="canvas"></canvas-area>
 
-        <h2 class="word">[[word]]</h2>
+        <h2 class="word" id="currentword">[[currentWord]]</h2>
+
+        <div id="recognizedwords"></div>
     </template>
 
     <script>
@@ -66,6 +146,28 @@
                     },
                     word: {
                         type: String
+                    },
+                    timerColors: {
+                        type: Array,
+                        value: () => [
+                            '#2e7d32',
+                            '#689f38',
+                            '#ffd600',
+                            '#ff6f00',
+                            '#b71c1c'
+                        ]
+                    },
+                    results: {
+                        type: Array,
+                        value: () => []
+                    },
+                    recognizedWord: {
+                        type: String,
+                        value: ''
+                    },
+                    round: {
+                        type: Number,
+                        value: 0
                     }
                 };
             }
@@ -76,35 +178,257 @@
                 ]
             }
 
+            sendData(url) {
+                fetch(url)
+                    .then(res => res.blob())
+                    .then(blob => {
+                        let fileReader = new FileReader();
+                        fileReader.onload = function () {
+                            sendBlob(this.result);
+                        };
+                        fileReader.readAsArrayBuffer(blob);
+                    });
+            }
+
             ready() {
                 super.ready();
 
-                this.addEventListener('data', data => {
-                    let url = data.detail.fit.toDataURL("image/png");
+                this.time = 30;
 
-                    fetch(url)
-                        .then(res => res.blob())
-                        .then(blob => {
-                            let fileReader = new FileReader();
-                            fileReader.onload = function() {
-                                sendBlob(this.result);
-                            };
-                            fileReader.readAsArrayBuffer(blob);
+                this.wordMap = {
+                    "airplane": "Flugzeug",
+                    "alarm_clock": "Wecker",
+                    "angel": "Engel",
+                    "ant": "Ameise",
+                    "anvil": "Amboss",
+                    "apple": "Apfel",
+                    "axe": "Axt",
+                    "banana": "Banane",
+                    "baseball_bat": "Baseballschläger",
+                    "basket": "Korb",
+                    "bat": "Fledermaus",
+                    "bathtub": "Badewanne",
+                    "bear": "Bär",
+                    "beard": "Bart",
+                    "bed": "Bett",
+                    "bee": "Biene",
+                    "belt": "Gürtel",
+                    "bench": "Bank",
+                    "bicycle": "Fahrrad",
+                    "bird": "Vogel",
+                    "birthday cake": "Geburtstagskuchen",
+                    "book": "Buch",
+                    "bowtie": "Fliege",
+                    "bread": "Brot",
+                    "bridge": "Brücke",
+                    "bus": "Bus",
+                    "butterfly": "Schmetterling",
+                    "cactus": "Kaktus",
+                    "calculator": "Taschenrechner",
+                    "calendar": "Kalender",
+                    "camera": "Kamera",
+                    "candle": "Kerze",
+                    "car": "Auto",
+                    "carrot": "Karotte",
+                    "cat": "Katze",
+                    "chair": "Stuhl",
+                    "church": "Kirche",
+                    "clock": "Uhr",
+                    "cloud": "Wolke",
+                    "compass": "Kompass",
+                    "computer": "Computer",
+                    "cookie": "Cookie",
+                    "couch": "Couch",
+                    "cow": "Kuh",
+                    "crown": "Krone",
+                    "cup": "Tasse",
+                    "diamond": "Diamant",
+                    "dog": "Hund",
+                    "donut": "Donut",
+                    "door": "Tür",
+                    "ear": "Ohr",
+                    "eye": "Auge",
+                    "eyeglasses": "Brille",
+                    "feather": "Feder",
+                    "fence": "Zaun",
+                    "fish": "Fisch",
+                    "flashlight": "Taschenlampe",
+                    "flip_flops": "Flip Flops",
+                    "flower": "Blume",
+                    "foot": "Fuß",
+                    "fork": "Gabel",
+                    "frog": "Frosch",
+                    "giraffe": "Giraffe",
+                    "guitar": "Gitarre",
+                    "hammer": "Hammer",
+                    "hand": "Hand",
+                    "hat": "Hut",
+                    "headphones": "Kopfhörer",
+                    "hot_air_balloon": "Heißluftballon",
+                    "hourglass": "Sanduhr",
+                    "house": "Haus",
+                    "hurricane": "Hurrikan",
+                    "ice_cream": "Eis",
+                    "jail": "Gefängnis",
+                    "key": "Schlüssel",
+                    "knife": "Messer",
+                    "ladder": "Leiter",
+                    "light_bulb": "Glühbirne",
+                    "lightning": "Blitz",
+                    "mountain": "Berg",
+                    "mushroom": "Pilz",
+                    "pants": "Hose",
+                    "paper_clip": "Büroklammer",
+                    "pizza": "Pizza",
+                    "rainbow": "Regenbogen",
+                    "sailboat": "Segelboot",
+                    "scissors": "Schere",
+                    "shark": "Hai",
+                    "smiley_face": "Smiley-Gesicht",
+                    "soccer_ball": "Fußball",
+                    "spoon": "Löffel",
+                    "sun": "Sonne",
+                    "tent": "Zelt",
+                    "tooth": "Zahn",
+                    "tornado": "Tornado",
+                    "traffic_light": "Ampel",
+                    "train": "Zug",
+                    "tree": "Baum",
+                    "t-shirt": "T-Shirt"
+                };
+
+                this.wordKeys = Object.keys(this.wordMap);
+
+                this.addEventListener('data', data => {
+                    this.sendData(data.detail.fit.toDataURL("image/png"));
+                });
+
+                window.addEventListener('socketMessage', e => {
+                    if (typeof e.detail.data === "string") {
+                        const res = JSON.parse(e.detail.data);
+
+                        let answers = [];
+
+                        Object.keys(res).map((key, index) => {
+                            answers.push({key: key, value: res[key]});
                         });
+
+                        answers.sort((a, b) => {
+                            return b.value - a.value;
+                        });
+
+                        console.log(answers);
+
+                        if (answers[0].value > 0.03) {
+                            if (this.currentWordKey === answers[0].key) {
+                                clearInterval(this.timer);
+
+                                this.results.push({
+                                    time: (new Date()).getTime() - this.timeStart,
+                                    accuracy: answers[0].value,
+                                    wordKey: answers[0].key,
+                                    word: this.wordMap[answers[0].key],
+                                    image: this.$.canvas.getTrimmedImage(),
+                                    correct: true
+                                });
+
+                                this.classList.add('done', 'correct');
+
+                                setTimeout(() => {
+                                    this.startNewRound();
+                                }, 1000)
+                            } else if (this.wordMap[answers[0].key] !== this.recognizedWord) {
+                                this.recognizedWord = this.wordMap[answers[0].key];
+
+                                const word = document.createElement('h3');
+                                word.classList.add('recognizedWord');
+                                word.style.opacity = answers[0].value;
+                                word.appendChild(document.createTextNode(this.recognizedWord));
+                                this.$.recognizedwords.appendChild(word);
+                                setTimeout(() => word.remove(), 2500);
+                            }
+                        }
+                    }
                 });
 
                 window.addEventListener('location-changed', () => {
+                    if (!this.route.active) clearInterval(this.timer);
+
                     setTimeout(() => {
                         window.dispatchEvent(new Event('resize'));
-                        if (this.route.active) clearInterval(interval);
                     }, 200);
                 });
             }
 
+            _generateTimerStyle(timeLeft, time) {
+                const color = this.timerColors[Math.round((time - timeLeft) * 4 / time) || 0];
+
+                return `
+                    width: ${timeLeft * 100 / time}%;
+                    background-color: ${color};
+                `
+            }
+
+            clearCanvas() {
+                this.$.canvas.clear();
+            }
+
+            startNewRound() {
+                this.round++;
+
+                clearInterval(this.timer);
+                this.clearCanvas();
+
+                if (this.round > 5) {
+                    this.dispatchEvent(new CustomEvent('navigateTo', {
+                        detail: {path: 'result'},
+                        bubbles: true,
+                        composed: true
+                    }));
+
+                    this.round = 0;
+                }
+
+                this.timeStart = (new Date()).getTime();
+
+                this.currentWordKey = this.wordKeys[Math.floor(Math.random() * this.wordKeys.length)];
+                this.currentWord = this.wordMap[this.currentWordKey];
+
+                this.timeLeft = this.time;
+                this.classList.remove('done', 'correct', 'wrong');
+
+                this.timer = setInterval(() => {
+                    --this.timeLeft;
+
+                    if (this.timeLeft <= 0) {
+                        clearInterval(this.timer);
+                        this.classList.add('done', 'wrong');
+
+                        this.results.push({
+                            time: (new Date()).getTime() - this.timeStart,
+                            accuracy: 0,
+                            wordKey: this.currentWordKey,
+                            word: this.currentWord,
+                            image: this.$.canvas.getTrimmedImage(),
+                            correct: false
+                        });
+
+                        setTimeout(() => {
+                            this.startNewRound();
+                        }, 1000);
+                    } else {
+                        this.sendData(this.$.canvas.getTrimmedImage().toDataURL('image/png'));
+                    }
+                }, 1000);
+            }
+
             routeChanged() {
-                const words = ['Fliege', 'Amboss', 'Apfel', 'Flieger', 'Kamel', 'Axt', 'Banane', 'Basketball',
-                    'Kartoffel', 'Socke', 'Sandwich', 'Teekanne', 'Fallschirm', 'Schwein', 'Panda'];
-                this.word = words[Math.floor(Math.random() * words.length)];
+                if (this.route.prefix === '/game') {
+                    this.startNewRound();
+                    this.results = [];
+                } else {
+                    clearInterval(this.timer);
+                }
             }
         }
 

@@ -9,14 +9,17 @@
         "use strict";
 
         //Currently the test and such the only port
-        let socket = new WebSocket("ws://localhost:9000");
+        let socket = new WebSocket(document.location.hash ? "ws://" + document.location.hash.substr(1) : "wss://ipml-api.herokuapp.com");
         socket.binaryType = 'arraybuffer';
 
         //Callback when the sockets recieves a message (should only be a result json here)
         socket.onmessage = function (result) {
             if (typeof result.data === "string") {
-                console.log("JS-Socket: Message received | ", result.data);
-                return result.data;
+                window.dispatchEvent(new CustomEvent('socketMessage', {
+                    bubbles: true,
+                    composed: true,
+                    detail: result
+                }))
             } else {
                 console.error("JS-Socket: Received response of wrong type");
             }
