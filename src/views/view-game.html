@@ -352,8 +352,6 @@
                 });
 
                 window.addEventListener('location-changed', () => {
-                    if (!this.route.active) clearInterval(this.timer);
-
                     setTimeout(() => {
                         window.dispatchEvent(new Event('resize'));
                     }, 200);
@@ -387,6 +385,7 @@
                     }));
 
                     this.round = 0;
+                    return;
                 }
 
                 this.timeStart = (new Date()).getTime();
