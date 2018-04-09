@@ -29,6 +29,11 @@
         socket.onopen = function() {
             console.log("JS-Socket: Connected");
             isopen = true;
+
+            window.dispatchEvent(new CustomEvent('socketConnected', {
+                bubbles: true,
+                composed: true
+            }))
         };
 
         //Callback when the socket closes

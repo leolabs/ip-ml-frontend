@@ -3,88 +3,105 @@
 <link rel="import" href="../../bower_components/paper-styles/paper-styles.html">
 
 <dom-module id="view-intro">
-  <template>
-    <style>
-      :host {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-      }
+    <template>
+        <style>
+            :host {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+            }
 
-      .background {
-        position: absolute;
-        z-index: -2;
-        opacity: 0.08;
-        top: 0; bottom: 0;
-        left: 0; right: 0;
-        background: url('/images/background.svg') center no-repeat;
-        background-size: cover;
-      }
+            .background {
+                position: absolute;
+                z-index: -2;
+                opacity: 0.08;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: url('/images/background.svg') center no-repeat;
+                background-size: cover;
+            }
 
-      img {
-        display: block;
-        max-width: 300px;
-        margin: 10px 10px 50px;
-      }
+            img {
+                display: block;
+                max-width: 300px;
+                margin: 10px 10px 50px;
+            }
 
-      video {
-        width: 100%;
-        max-width: 1000px;
-        height: auto;
-        margin-bottom: 50px;
-        mix-blend-mode: multiply;
-      }
+            video {
+                width: 100%;
+                max-width: 1000px;
+                height: auto;
+                margin-bottom: 50px;
+                mix-blend-mode: multiply;
+            }
 
-      paper-button {
-        background-color: #1CB5AC;
-        font-size: 30px;
-        color: #fff;
-        text-transform: uppercase;
-      }
-    </style>
+            paper-button {
+                background-color: #1CB5AC;
+                font-size: 30px;
+                color: #fff;
+                text-transform: uppercase;
+            }
+        </style>
 
-    <div class="background"></div>
+        <div class="background"></div>
 
-    <img src="../../images/logo.svg">
+        <img src="../../images/logo.svg">
 
-    <video autoplay loop muted>
-      <source id="mp4" src="/videos/ " type="video/mp4">
-      <source id="webm" src="/videos/intro.webm" type="video/webm">
-    </video>
+        <video autoplay loop muted>
+            <source id="mp4" src="/videos/ " type="video/mp4">
+            <source id="webm" src="/videos/intro.webm" type="video/webm">
+        </video>
 
-    <paper-button raised on-tap="start">Let's go!</paper-button>
-  </template>
+        <paper-button raised on-tap="start" disabled="[[!socketConnected]]">[[buttonText]]</paper-button>
+    </template>
 
-  <script>
-    /**
-     * @customElement
-     * @polymer
-     */
-    class ViewIntro extends Polymer.Element {
-      static get is() { return 'view-intro'; }
-      static get properties() {
-        return {
+    <script>
+        /**
+         * @customElement
+         * @polymer
+         */
+        class ViewIntro extends Polymer.Element {
+            static get is() {
+                return 'view-intro';
+            }
 
-        };
-      }
+            static get properties() {
+                return {
+                    socketConnected: {
+                        type: Boolean,
+                        value: false
+                    },
+                    buttonText: {
+                        type: String,
+                        computed: 'computeButtonText(socketConnected)'
+                    }
+                };
+            }
 
-      ready() {
-          super.ready();
-      }
+            computeButtonText(socketConnected) {
+                return socketConnected ? "Let's go!" : "Connecting to AI Server..."
+            }
 
-      start() {
-          console.log('start');
+            ready() {
+                super.ready();
+                window.addEventListener('socketConnected', () => this.socketConnected = true);
+            }
 
-          this.dispatchEvent(new CustomEvent('navigateTo', {
-              detail: {path: 'game'},
-              bubbles: true,
-              composed: true
-          }));
-      }
-    }
+            start() {
+                console.log('start');
 
-    window.customElements.define(ViewIntro.is, ViewIntro);
-  </script>
+                this.dispatchEvent(new CustomEvent('navigateTo', {
+                    detail: {path: 'game'},
+                    bubbles: true,
+                    composed: true
+                }));
+            }
+        }
+
+        window.customElements.define(ViewIntro.is, ViewIntro);
+    </script>
 </dom-module>
