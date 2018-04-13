@@ -5,7 +5,8 @@ using machine learning in a graphical context to recognize objects in drawings.
 
 This frontend is developed using [Polymer](https://www.polymer-project.org/) and uses WebSockets to
 communicate with our AI server. It is split into three views – intro, game and result – which can be found in 
-the `src/views` folder. 
+the `src/views` folder. Each view is an encapsulated component, the three views are called in `src/main-app.html`
+which also handles routing.
 
 ## Getting Started
 
