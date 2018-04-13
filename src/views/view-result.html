@@ -1,34 +1,127 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../components/canvas-area.html">
+
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-styles/paper-styles.html">
 
 <dom-module id="view-result">
-  <template>
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+    <template>
+        <style>
+            :host {
+                font-family: 'Roboto', 'Noto', sans-serif;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+            }
 
-    <h1>Ergebnis</h1>
-  </template>
+            h1 {
+                font-size: 60px;
+                margin-bottom: 40px;
+            }
 
-  <script>
-    /**
-     * @customElement
-     * @polymer
-     */
-    class ViewResult extends Polymer.Element {
-      static get is() { return 'view-result'; }
-      static get properties() {
-        return {
-        };
-      }
+            h3 {
+                margin-bottom: 0;
+            }
 
-      ready() {
-          super.ready();
-      }
-    }
+            .result-list {
+                display: flex;
+                width: 100%;
+                max-width: 1200px;
+                margin-bottom: 40px;
+            }
 
-    window.customElements.define(ViewResult.is, ViewResult);
-  </script>
+            .result {
+                flex-basis: 0;
+                flex-grow: 1;
+                margin: 10px;
+                padding: 10px;
+            }
+
+            .result img {
+                width: 100%;
+                height: 200px;
+                object-fit: contain;
+            }
+
+            .correct {
+                color: #2e7d32;
+            }
+
+            .wrong {
+                color: #b71c1c;
+            }
+
+            paper-button {
+                background-color: #1CB5AC;
+                font-size: 30px;
+                color: #fff;
+                text-transform: uppercase;
+            }
+        </style>
+
+        <h1>Dein Ergebnis</h1>
+
+        <div class="result-list">
+             <dom-repeat items="{{results}}">
+                <template>
+                    <div class="result">
+                        <img src="[[item.image]]">
+                        <h2 class$="[[wordColor(item)]]">[[item.word]]</h2>
+                        <h3>[[timeValue(item)]] Sekunden, [[percentValue(item)]]% erkannt</h3>
+                    </div>
+                </template>
+            </dom-repeat>
+        </div>
+
+        <paper-button raised on-tap="newGame">Neues Spiel</paper-button>
+    </template>
+
+    <script>
+        /**
+         * @customElement
+         * @polymer
+         */
+        class ViewResult extends Polymer.Element {
+            static get is() {
+                return 'view-result';
+            }
+
+            static get properties() {
+                return {
+                    results: {
+                        type: Array,
+                        value: () => []
+                    }
+                };
+            }
+
+            ready() {
+                super.ready();
+            }
+
+            wordColor(item) {
+                return item.correct ? 'correct' : 'wrong';
+            }
+
+            percentValue(item) {
+                return Math.round(item.accuracy * 100);
+            }
+
+            timeValue(item) {
+                return Math.round(item.time / 1000);
+            }
+
+            newGame() {
+                this.dispatchEvent(new CustomEvent('navigateTo', {
+                    detail: {path: 'game'},
+                    bubbles: true,
+                    composed: true
+                }));
+            }
+        }
+
+        window.customElements.define(ViewResult.is, ViewResult);
+    </script>
 </dom-module>
