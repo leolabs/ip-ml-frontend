@@ -64,7 +64,7 @@
         <h1>Dein Ergebnis</h1>
 
         <div class="result-list">
-             <dom-repeat items="{{results}}">
+             <dom-repeat items="{{resultsInternal}}">
                 <template>
                     <div class="result">
                         <img src="[[item.image]]">
@@ -93,12 +93,20 @@
                     results: {
                         type: Array,
                         value: () => []
+                    },
+                    resultsInternal: {
+                        type: Array,
+                        computed: 'computeResults(results.*)'
                     }
                 };
             }
 
             ready() {
                 super.ready();
+            }
+
+            computeResults() {
+                return JSON.parse(JSON.stringify(this.results));
             }
 
             wordColor(item) {
