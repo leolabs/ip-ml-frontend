@@ -28,8 +28,8 @@
 
         <iron-pages selected="[[data.page]]" attr-for-selected="data-view" fallback-selection="intro">
             <view-intro data-view="intro" route="{{tail}}"></view-intro>
-            <view-game data-view="game" route="{{tail}}"></view-game>
-            <view-result data-view="result" route="{{tail}}"></view-result>
+            <view-game data-view="game" route="{{tail}}" results="{{results}}"></view-game>
+            <view-result data-view="result" route="{{tail}}" results="[[results]]"></view-result>
         </iron-pages>
     </template>
 

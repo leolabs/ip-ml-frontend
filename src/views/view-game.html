@@ -159,7 +159,8 @@
                     },
                     results: {
                         type: Array,
-                        value: () => []
+                        value: () => [],
+                        notify: true
                     },
                     recognizedWord: {
                         type: String,
@@ -319,7 +320,7 @@
 
                         console.log(answers);
 
-                        if (answers[0].value > 0.03) {
+                        if (answers[0].value > 0.05) {
                             if (this.currentWordKey === answers[0].key) {
                                 clearInterval(this.timer);
 
@@ -328,7 +329,7 @@
                                     accuracy: answers[0].value,
                                     wordKey: answers[0].key,
                                     word: this.wordMap[answers[0].key],
-                                    image: this.$.canvas.getTrimmedImage(),
+                                    image: this.$.canvas.getTrimmedImage().toDataURL(),
                                     correct: true
                                 });
 
@@ -408,14 +409,14 @@
                             accuracy: 0,
                             wordKey: this.currentWordKey,
                             word: this.currentWord,
-                            image: this.$.canvas.getTrimmedImage(),
+                            image: this.$.canvas.getTrimmedImage().toDataURL(),
                             correct: false
                         });
 
                         setTimeout(() => {
                             this.startNewRound();
                         }, 1000);
-                    } else {
+                    } else if(this.$.canvas.width > 0 && this.$.canvas.height > 0) {
                         this.sendData(this.$.canvas.getTrimmedImage().toDataURL('image/png'));
                     }
                 }, 1000);
@@ -424,7 +425,7 @@
             routeChanged() {
                 if (this.route.prefix === '/game') {
                     this.startNewRound();
-                    this.shuffle(this.wordKeys);
+                    this.wordKeys = this.shuffle(this.wordKeys);
                     this.results = [];
                 } else {
                     clearInterval(this.timer);
