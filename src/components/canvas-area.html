@@ -39,9 +39,11 @@
             connectedCallback() {
                 super.connectedCallback();
 
+                const strokeWidth = window.width / 128;
+
                 this.signaturePad = new SignaturePad(this.$.canvas, {
-                    minWidth: 10,
-                    maxWidth: 10,
+                    minWidth: strokeWidth,
+                    maxWidth: strokeWidth,
                     onEnd: () => {
                         const trimmed = this.trim(this.$.canvas);
                         const fit = this.fit(trimmed);
