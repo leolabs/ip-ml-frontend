@@ -39,7 +39,7 @@
             connectedCallback() {
                 super.connectedCallback();
 
-                const strokeWidth = window.width / 128;
+                const strokeWidth = window.innerWidth / 128;
 
                 this.signaturePad = new SignaturePad(this.$.canvas, {
                     minWidth: strokeWidth,
